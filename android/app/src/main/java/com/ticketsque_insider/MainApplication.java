@@ -1,4 +1,4 @@
-package com.ticketsque.insider;
+package com.LeagueX.insider;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

@@ -1,47 +1,85 @@
-import React, { Component } from 'react';
-import { View, Text, StatusBar } from 'react-native';
-import { app_Bg } from '../components/common/Constants';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginContainer from '../container/Common/Login/LoginContainer';
-import ForgetPasswordContainer from '../container/Common/Login/ForgetPasswordContainer';
-import MPINLoginContainer from '../container/Common/Login/MPINLoginContainer';
-import ResetPasswordContainer from '../container/Common/Login/ResetPasswordContainer';
-import SetMPINContainer from '../container/Common/Login/SetMPINContainer';
-import EditProfileContainer from '../container/Common/Profile/EditProfileContainer';
-import ValidatorTabNavigation from '../navigation/ValidatorTabNavigation';
-import ChangeMpinContainer from '../container/Common/Profile/ChangeMpinContainer';
-import TransactionContainer from '../container/Validator/Home/TransactionContainer';
+import { createStackNavigator } from '@react-navigation/stack';
+import { TransitionSpecs } from '@react-navigation/stack';
 
-const Stack = createNativeStackNavigator();
+import HomeContainer from '../container/HomeContainer';
+import GameDetailScreen from '../screens/GameDetailScreen';
 
-const Navigation = (props) => {
+const Stack = createStackNavigator();
 
+const zoomInTransition = {
+  gestureDirection: 'horizontal',
+  transitionSpec: {
+    open: TransitionSpecs.TransitionIOSSpec,
+    close: TransitionSpecs.TransitionIOSSpec,
+  },
+  cardStyleInterpolator: ({ current }) => {
+    return {
+      cardStyle: {
+        transform: [
+          {
+            scale: current.progress.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [1.5, 1.2, 1],
+            }),
+          },
+        ],
+      },
+    };
+  },
+};
+
+const slideInTransition = {
+  gestureDirection: 'horizontal',
+  transitionSpec: {
+    open: TransitionSpecs.TransitionIOSSpec,
+    close: TransitionSpecs.TransitionIOSSpec,
+  },
+  cardStyleInterpolator: ({ current, layouts }) => {
+    const progress = current.progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [layouts.screen.width, 0],
+    });
+
+    const scale = current.progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 0.9],
+    });
+
+    return {
+      cardStyle: {
+        transform: [{ translateX: progress }, { scale }],
+      },
+    };
+  },
+};
+
+const Navigation = () => {
   return (
     <NavigationContainer>
-      <StatusBar
-        backgroundColor={app_Bg}
-        animated={true}
-        barStyle="dark-content"
-      />
       <Stack.Navigator
-        initialRouteName={props.initialScreen}
-        screenOptions={{ headerShown: false, gestureEnabled:false }}>
-        {/* common screens */}
-        <Stack.Screen name="LoginContainer" component={LoginContainer} />
-        <Stack.Screen name="ForgetPasswordContainer" component={ForgetPasswordContainer} />
-        <Stack.Screen name="MPINLoginContainer" component={MPINLoginContainer} />
-        <Stack.Screen name="ResetPasswordContainer" component={ResetPasswordContainer} />
-        <Stack.Screen name="SetMPINContainer" component={SetMPINContainer} />
-        <Stack.Screen name="EditProfileContainer" component={EditProfileContainer} />
-
-        {/* Validators Screens */}
-        <Stack.Screen name="ValidatorTabNavigation" component={ValidatorTabNavigation} />
-        <Stack.Screen name="TransactionContainer" component={TransactionContainer} />
-        <Stack.Screen name='ChangeMpinContainer' component={ChangeMpinContainer} />
+        initialRouteName="HomeContainer"
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          cardStyle: { backgroundColor: 'transparent' },
+          cardOverlayEnabled: true,
+        }}
+      >
+        <Stack.Screen
+          name="HomeContainer"
+          component={HomeContainer}
+          options={{ ...zoomInTransition }}
+        />
+        <Stack.Screen
+          name="GameDetailScreen"
+          component={GameDetailScreen}
+          options={{ ...zoomInTransition }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 export default Navigation;
